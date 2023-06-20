@@ -4,10 +4,15 @@ import android.Manifest
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
+import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -17,11 +22,19 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.get
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileOutputStream
 
 class MainActivity : AppCompatActivity() {
 
     private var drawingView: DrawingView? = null
     private var imageButtonCurrentPaint: ImageButton? = null
+    private var customProgressDialog: Dialog? = null
 
     private val openGalleryLauncher: ActivityResultLauncher<Intent> =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
@@ -129,6 +142,18 @@ class MainActivity : AppCompatActivity() {
 
         val ibUndo: ImageButton = findViewById(R.id.ibUndo)
         ibUndo.setOnClickListener { drawingView?.onClickUndo() }
+
+        val ibSave: ImageButton = findViewById(R.id.ibSave)
+        ibSave.setOnClickListener {
+            if(isReadStorageAllowed()){
+                showProgressDialog()
+                lifecycleScope.launch {
+                    val flDrawingView: FrameLayout = findViewById(R.id.flDrawingViewContainer)
+
+                    saveBitmapFile(getBitmapFromView(flDrawingView))
+                }
+            }
+        }
     }
 
     private fun showRationalDialog(title: String, message: String){
@@ -139,6 +164,12 @@ class MainActivity : AppCompatActivity() {
         builder.create().show()
     }
 
+    private fun isReadStorageAllowed(): Boolean{
+        val result = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+
+        return result == PackageManager.PERMISSION_GRANTED
+    }
+
     private fun requestStoragePermission(){
         if(ActivityCompat.shouldShowRequestPermissionRationale(
                 this, Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -147,8 +178,92 @@ class MainActivity : AppCompatActivity() {
         }
         else{
             requestPersmission.launch(
-                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
+                arrayOf(
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                )
             )
+        }
+    }
+
+    private fun getBitmapFromView(view: View): Bitmap{
+        val bitmap = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        val bgDrawable = view.background
+
+        if(bgDrawable != null){
+            bgDrawable.draw(canvas)
+        }
+        else{
+            canvas.drawColor(Color.WHITE)
+        }
+
+        view.draw(canvas)
+
+        return bitmap
+    }
+
+    private suspend fun saveBitmapFile(bitmap: Bitmap?): String{
+        var result = ""
+
+        withContext(Dispatchers.IO){
+            if(bitmap != null){
+                try{
+                    val bytes = ByteArrayOutputStream()
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 90, bytes)
+
+                    val file = File(
+                        externalCacheDir?.absoluteFile.toString() +
+                        File.separator + "kidsDrawingApp_" + System.currentTimeMillis() / 1000 + ".png"
+                    )
+
+                    val fo = FileOutputStream(file)
+                    fo.write(bytes.toByteArray())
+                    fo.close()
+
+                    result = file.absolutePath
+
+                    runOnUiThread {
+                        cancelProgressDialog()
+
+                        if(result.isNotEmpty()){
+                            Toast.makeText(
+                                this@MainActivity,
+                                "File saved at $result",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                        else{
+                            Toast.makeText(
+                                this@MainActivity,
+                                "Something went wrong saving the file.",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                }
+                catch (e: Exception){
+                    result = ""
+                    e.printStackTrace()
+                }
+            }
+        }
+
+        return result
+    }
+
+    private fun showProgressDialog(){
+        customProgressDialog = Dialog(this@MainActivity)
+
+        customProgressDialog?.setContentView(R.layout.dialog_custom_progress)
+        customProgressDialog?.setCancelable(false)
+        customProgressDialog?.show()
+    }
+
+    private fun cancelProgressDialog(){
+        if(customProgressDialog != null){
+            customProgressDialog?.dismiss()
+            customProgressDialog = null
         }
     }
 
