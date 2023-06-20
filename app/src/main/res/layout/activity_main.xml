@@ -6,29 +6,44 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <gr.georkouk.kidsdrawingapp.DrawingView
-        android:id="@+id/drawingView"
+    <FrameLayout
+        android:id="@+id/flDrawingViewContainer"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_margin="4dp"
         android:background="@drawable/background_drawable_layout"
+        android:padding="1dp"
         app:layout_constraintBottom_toTopOf="@+id/llPaintColors"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/ivBackground"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop" />
+
+        <gr.georkouk.kidsdrawingapp.DrawingView
+            android:id="@+id/drawingView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#80FFFFFF" />
+
+    </FrameLayout>
 
     <ImageButton
         android:id="@+id/ibBrush"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="4dp"
         android:layout_marginTop="4dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="4dp"
         android:scaleType="fitXY"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/ibGallery"
         app:layout_constraintTop_toBottomOf="@+id/llPaintColors"
         app:srcCompat="@drawable/ic_brush" />
 
@@ -43,7 +58,7 @@
         app:layout_constraintBottom_toTopOf="@+id/ibBrush"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/drawingView">
+        app:layout_constraintTop_toBottomOf="@+id/flDrawingViewContainer">
 
         <ImageButton
             android:layout_width="25dp"
@@ -52,8 +67,8 @@
             android:layout_marginTop="4dp"
             android:layout_marginEnd="4dp"
             android:layout_marginBottom="4dp"
-            android:tag="@color/skin"
             android:background="@color/skin"
+            android:tag="@color/skin"
             app:srcCompat="@drawable/pallet_normal" />
 
         <ImageButton
@@ -63,8 +78,8 @@
             android:layout_marginTop="4dp"
             android:layout_marginEnd="4dp"
             android:layout_marginBottom="4dp"
-            android:tag="@color/black"
             android:background="@color/black"
+            android:tag="@color/black"
             app:srcCompat="@drawable/pallet_normal" />
 
         <ImageButton
@@ -74,8 +89,8 @@
             android:layout_marginTop="4dp"
             android:layout_marginEnd="4dp"
             android:layout_marginBottom="4dp"
-            android:tag="@color/red"
             android:background="@color/red"
+            android:tag="@color/red"
             app:srcCompat="@drawable/pallet_normal" />
 
         <ImageButton
@@ -85,8 +100,8 @@
             android:layout_marginTop="4dp"
             android:layout_marginEnd="4dp"
             android:layout_marginBottom="4dp"
-            android:tag="@color/green"
             android:background="@color/green"
+            android:tag="@color/green"
             app:srcCompat="@drawable/pallet_normal" />
 
         <ImageButton
@@ -96,8 +111,8 @@
             android:layout_marginTop="4dp"
             android:layout_marginEnd="4dp"
             android:layout_marginBottom="4dp"
-            android:tag="@color/blue"
             android:background="@color/blue"
+            android:tag="@color/blue"
             app:srcCompat="@drawable/pallet_normal" />
 
         <ImageButton
@@ -107,8 +122,8 @@
             android:layout_marginTop="4dp"
             android:layout_marginEnd="4dp"
             android:layout_marginBottom="4dp"
-            android:tag="@color/yellow"
             android:background="@color/yellow"
+            android:tag="@color/yellow"
             app:srcCompat="@drawable/pallet_normal" />
 
         <ImageButton
@@ -118,8 +133,8 @@
             android:layout_marginTop="4dp"
             android:layout_marginEnd="4dp"
             android:layout_marginBottom="4dp"
-            android:tag="@color/lollipop"
             android:background="@color/lollipop"
+            android:tag="@color/lollipop"
             app:srcCompat="@drawable/pallet_normal" />
 
         <ImageButton
@@ -129,8 +144,8 @@
             android:layout_marginTop="4dp"
             android:layout_marginEnd="4dp"
             android:layout_marginBottom="4dp"
-            android:tag="@color/random"
             android:background="@color/random"
+            android:tag="@color/random"
             app:srcCompat="@drawable/pallet_normal" />
 
         <ImageButton
@@ -140,10 +155,25 @@
             android:layout_marginTop="4dp"
             android:layout_marginEnd="4dp"
             android:layout_marginBottom="4dp"
-            android:tag="@color/white"
             android:background="@color/white"
+            android:tag="@color/white"
             app:srcCompat="@drawable/pallet_normal" />
 
     </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/ibGallery"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginBottom="4dp"
+        android:scaleType="fitXY"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/ibBrush"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/llPaintColors"
+        app:srcCompat="@drawable/ic_gallery" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
